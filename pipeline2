@@ -1,0 +1,21 @@
+node('docker') {
+    stage('Checkout') {
+    checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/lidorg-dev/node-hello.git']])
+    }
+    stage('Build') {
+    sh "docker build -t tomeroz802/hello-world-amichai:${env.BUILD_NUMBER} ."
+    }
+    stage('Test') {
+    sh "docker run -itd --name node-hello-new -p 3000:3000 tomeroz802/hello-world-amichai:${env.BUILD_NUMBER}"
+    sh "sleep 4"
+    sh "curl localhost:3000"
+    sh "docker stop node-hello-new && docker rm node-hello-new"
+    }
+    stage('Push to DockerHub') {
+        withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'pass', usernameVariable: 'user')]) {
+     sh "docker login -u $user -p $pass"
+    sh "docker push tomeroz802/hello-world-amichai:${env.BUILD_NUMBER}"
+            }
+   
+    }
+}
