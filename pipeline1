@@ -1,0 +1,47 @@
+node {
+    stage('Checkout from Git ') {
+    cleanWs()
+    checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/lidorg-dev/hello-world-python.git']])
+    
+    
+    }
+    stage('Build - Compile ') {
+    
+    sh 'pip install -r requirements.txt'
+    sh 'sed -i "s/8080/8888/g" app.py'
+    
+    
+    }
+    stage('Test') {
+    
+    sh 'python3 app.py&'
+    
+    
+    }
+    
+    stage('Package') {
+    
+   
+    sh 'tar cvfz app.tar.gz *'
+    
+    
+    }
+    
+    stage('Integration Tests') {
+    
+    sh 'curl 127.0.0.1:8888'
+
+    
+    }
+    
+
+    
+    stage('archive artifact') {
+    
+    archiveArtifacts artifacts: 'app.tar.gz', followSymlinks: false
+    
+    chuckNorris()
+    }
+   
+    
+}
