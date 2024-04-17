@@ -1,0 +1,14 @@
+podTemplate(containers: [
+    containerTemplate(name: 'python', image: 'python', command: 'sleep', args: '99d')
+  ]) {
+
+    node(POD_LABEL) {
+        stage('run python') {
+            git branch: 'main', url: 'https://github.com/tomeroz802/hello-world-python-tomer.git'
+            container('python') {
+                sh 'python main.py'
+            }
+        }
+
+    }
+}
